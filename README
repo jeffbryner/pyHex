@@ -1,0 +1,75 @@
+pyHEX: a collection of hex utilities in python, because almost everything is better in
+python ;-]
+
+
+asciitohex.py: 
+
+	Simply spits out an ascii string in it's hex representation: 
+	
+	asciitohex.py something
+	73 6F 6D 65 74 68 69 6E 67
+	
+hextoascii.py: 
+	The reverse of the above, hex to an ascii string. Note: It makes no attempt
+	to sanitize the output and may try to 'print' unprintables.
+	
+		
+	hextoascii.py 73 6F 6D 65 74 68 69 6E 67
+	something
+	
+	hextoascii.py 4141
+	AA
+	
+
+hexfind.py 
+	Search a file for an ascii or hex value and output a hexdump
+	once the value is found. Can be used for file carving
+	in combination with xxd -r.
+
+
+	Usage: hexfind.py [options]
+
+	Options:
+	  -h, --help   show this help message and exit
+	  -b BYTES     number of bytes to show per line
+	  -s START     starting byte
+	  -l LENGTH    length in bytes to dump
+	  -f INPUT     input: stdin default, drive name, filename, etc
+	  -t TEXT      text string to search for
+	  -x HEX       hex string to search for
+	  -c COUNT     count of hits to find before stopping (0 for don't stop)
+	  -d, --debug  turn on debugging output
+	  -z, --zero   when printing output, count from zero rather than position hit
+        	       was found
+
+	Example of using it like sigfind to locate an NTFS partiton: 
+		
+		<hda is a qemu vm disk image>
+		
+		hexfind.py -t NTFS -f ~/vms/jabwin/hda 
+		0007E03: 4e54 4653 2020 2020 0002 0800 0000 0000  NTFS    ........
+		
+		
+
+	Using it to carve out a .gif file: 
+		Look for 2 potential files: 
+		
+		hexfind.py -t GIF89a -f ~/vms/jabwin/hda  -c2
+		005AA08: 4749 4638 3961 a000 8700 f700 0000 0000  GIF89a..........
+
+		0579E08: 4749 4638 3961 2200 2000 8000 00ff ffff  GIF89a". .......
+
+		Grab the 2nd one and send it to xxd to reconstitute it: 
+		hexfind.py -t GIF89a -f ~/vms/jabwin/hda -l 4096 -z -s 0x0579e08 | xxd -r > a.gif
+		
+		view it, etc. :
+		file a.gif 
+		a.gif: GIF image data, version 89a, 34 x 32
+
+
+
+pyxxd.py
+	A simplistic implementation of xxd in python. It can't do xxd -r reversing, but can do simple hexdumping. 
+	
+	cat a.gif | ./pyxxd.py 
+	0000000: 4749 4638 3961 2200 2000 8000 00ff ffff  GIF89a". .......
