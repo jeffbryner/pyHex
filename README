@@ -33,6 +33,7 @@ hexfind.py
       -b BYTES     number of bytes to show per line
       -s START     starting byte
       -l LENGTH    length in bytes to dump
+      -r CHUNK     length in bytes to read at a time
       -f INPUT     input: stdin default, drive name, filename, etc
       -t TEXT      text string to search for
       -x HEX       hex string to search for
