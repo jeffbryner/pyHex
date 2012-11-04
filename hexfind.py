@@ -78,6 +78,7 @@ if __name__ == '__main__':
     parser.add_option("-b", dest='bytes'  , default=16, type="int", help="number of bytes to show per line")
     parser.add_option("-s", dest='start' , default=0, type="int", help="starting byte")
     parser.add_option("-l", dest='length' , default=16, type="int", help="length in bytes to dump")     
+    parser.add_option("-r", dest='chunk' , default=1024, type="int", help="length in bytes to read at a time")
     parser.add_option("-f", dest='input', default="stdin",help="input: stdin default, drive name, filename, etc")
     parser.add_option("-t", dest='text', default="",help="text string to search for")
     parser.add_option("-x", dest='hex', default="",help="hex string to search for")    
@@ -95,15 +96,20 @@ if __name__ == '__main__':
     if options.input=="stdin" or options.input == '-':
         src=sys.stdin.read()
         src=StringIO(src)
+        #override the size
+        options.chunk=16
     else:
         if os.path.exists(options.input):
             src=file(options.input,'rb')
+            #if the file is smaller than our chunksize, reset.
+            options.chunk=min(os.path.getsize(options.input),options.chunk)
         else:
             sys.stderr.write(options.input)
             sys.stderr.write("No input file specified\n")
             sys.exit()
 
-    data=readChunk(src,options.start,options.length)
+    searchSize=max(len(options.text),len(options.hex)/2)
+    data=readChunk(src,options.start,options.chunk)
     if options.debug:
         print("[*] position: %d"%(src.tell())) 
     count=0
@@ -112,7 +118,7 @@ if __name__ == '__main__':
             #where is the string in this chunk of data
             dataPos=data.find(options.text)
             #where is the string in the file
-            dataAddress=(src.tell()-options.length)+dataPos
+            dataAddress=(max(0,(src.tell()-options.chunk))+dataPos)
             #what do we print in the hexoutput
             printAddress=dataAddress
             if options.zero:
@@ -127,7 +133,7 @@ if __name__ == '__main__':
             hexdata=convert_hex(data)
             dataPos=hexdata.find(options.hex.upper())/2
             #where is the string in the file
-            dataAddress=(src.tell()-options.length)+dataPos
+            dataAddress=(max(0,(src.tell()-options.chunk))+dataPos)
             #what do we print in the hexoutput
             printAddress=dataAddress
             if options.zero:
@@ -141,7 +147,7 @@ if __name__ == '__main__':
         if options.count <> 0 and options.count<=count:
             sys.exit()
         else:
-            data=readChunk(src,src.tell(),options.length)
+            data=readChunk(src,src.tell()-searchSize,options.chunk)
             if options.debug:
                 print("[*] position: %d"%(src.tell()))
 
