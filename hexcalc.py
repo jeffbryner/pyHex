@@ -2,6 +2,7 @@
 import re, collections
 from operator import add,sub,mul,div
 import readline
+import time
  
 Token = collections.namedtuple('Token', ['name', 'value'])
 RuleMatch = collections.namedtuple('RuleMatch', ['name', 'matched'])
@@ -73,6 +74,6 @@ if __name__ == '__main__':
         rawin=raw_input('> ')
         try:
             calcin=calc(rawin)
-            print('%d 0x%x'%(calcin,calcin))
-        except:
+            print('%d \t0x%x \t%s'%(calcin,calcin,time.ctime(calcin)))
+        except :
             pass
