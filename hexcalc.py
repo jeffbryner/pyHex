@@ -3,7 +3,12 @@ import re, collections
 from operator import add,sub,mul,div
 import readline
 import time
- 
+#2013 Jeff Bryner
+#a utility to do common math using a mix of hex, decimal and output hex,decimal,etc 
+#for use in binary/hex/decimal analysis
+#inspired by calcc by Luigi Auriemma
+#most calc code from: http://blog.erezsh.com/how-to-write-a-calculator-in-70-python-lines-by-writing-a-recursive-descent-parser/
+
 Token = collections.namedtuple('Token', ['name', 'value'])
 RuleMatch = collections.namedtuple('RuleMatch', ['name', 'matched'])
  
